@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BLACK VEIL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<div id="hud" hidden>
+  <div id="vig"></div>
+  <div id="dmg"><i></i></div>
+  <div id="cross"><b></b><b></b><b></b><b></b></div>
+  <div id="hm"></div>
+  <div id="compass"><div id="cstrip"></div><i id="cmark"></i><span id="cdist"></span></div>
+  <div id="obj"><small>OBJECTIVE</small><span id="objt"></span></div>
+  <div id="prompt"></div>
+  <div id="sub"></div>
+  <div id="hp"><small>HEALTH</small><div class="bar"><i id="hpf"></i></div><span id="hpn">100</span></div>
+  <div id="wpn"><small id="wname"></small><div><span id="mag">12</span><span id="res">/ 48</span></div><em id="rl"></em></div>
+  <div id="fps"></div>
+  <div id="toast"></div>
+</div>
+
+<div id="note" class="modal" hidden><div class="paper"><h3 id="noteT"></h3><pre id="noteB"></pre><small>Press E or Enter to close</small></div></div>
+<div id="choice" class="modal" hidden><div class="paper dark"><h3 id="chT"></h3><p id="chB"></p><div id="chO"></div><small>Press the number key to decide</small></div></div>
+
+<section id="s-main" class="scr">
+  <div class="logo"><span>BLACK</span><span>VEIL</span></div>
+  <div class="tag">A SINGLE-PLAYER STORY SHOOTER</div>
+  <nav class="menu">
+    <button id="btnContinue" data-a="continue">Continue</button>
+    <button data-a="new">New Game</button>
+    <button id="btnLoad" data-a="load">Load Game</button>
+    <button data-a="settings">Settings</button>
+    <button data-a="credits">Credits</button>
+    <button data-a="quit">Quit</button>
+  </nav>
+  <div class="foot">WASD move · Mouse aim · LMB fire · RMB aim · R reload · E interact · C crouch · 1-9 weapons</div>
+</section>
+
+<section id="s-settings" class="scr">
+  <h2>SETTINGS</h2>
+  <div id="tabs"></div>
+  <div id="rows"></div>
+  <nav class="menu row-menu"><button data-a="back">Back</button><button data-a="defaults">Reset to defaults</button></nav>
+</section>
+
+<section id="s-load" class="scr">
+  <h2>LOAD GAME</h2>
+  <div id="slots" class="menu"></div>
+  <nav class="menu"><button data-a="back">Back</button></nav>
+</section>
+
+<section id="s-save" class="scr">
+  <h2>SAVE GAME</h2>
+  <p>Choose one of five independent manual save slots.</p>
+  <div id="saveSlots" class="menu"></div>
+  <nav class="menu"><button data-a="back">Back</button></nav>
+</section>
+
+<section id="s-pause" class="scr">
+  <h2>PAUSED</h2>
+  <nav class="menu">
+    <button data-a="resume">Resume</button>
+    <button data-a="restart">Restart checkpoint</button>
+    <button data-a="journal">Journal</button>
+    <button data-a="save">Save Game</button>
+    <button data-a="settings">Settings</button>
+    <button data-a="mainmenu">Main menu</button>
+  </nav>
+</section>
+
+<section id="s-journal" class="scr">
+  <h2>JOURNAL</h2>
+  <div id="jlist"></div>
+  <nav class="menu"><button data-a="back">Back</button></nav>
+</section>
+
+<section id="s-confirm" class="scr">
+  <h2 id="cfMsg"></h2>
+  <nav class="menu row-menu"><button id="cfYes">Yes</button><button id="cfNo">No</button></nav>
+</section>
+
+<section id="s-card" class="scr">
+  <div id="cdK"></div><h1 id="cdT"></h1><div id="cdS"></div><div id="cdL"></div>
+  <nav class="menu"><button id="cdBtn">Continue</button></nav>
+</section>
+
+<section id="s-dead" class="scr">
+  <h1 class="red">YOU DIED</h1>
+  <nav class="menu"><button data-a="retry">Restart from checkpoint</button><button data-a="menu">Main menu</button></nav>
+</section>
+
+<section id="s-click" class="scr">
+  <button class="big" data-a="resume">CLICK TO CONTINUE</button>
+</section>
+
+<div id="boot">LOADING…</div>
+
+<script>
+// Offline-first runtime loader. Try the bundled r128 build, then independent CDN mirrors.
+// Start the game module only after a valid THREE global exists.
+(() => {
+  const boot = document.getElementById('boot');
+  const sources = [
+    'vendor/three.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+    'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+    'https://unpkg.com/three@0.128.0/build/three.min.js',
+    'https://raw.githubusercontent.com/mrdoob/three.js/r128/build/three.min.js',
+    'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/build/three.min.js',
+    'https://minime.stephan-brumme.com/files/threejs/three-r128.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js',
+    'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.js'
+  ];
+  let index = 0;
+  const loadNext = () => {
+    if (window.THREE && String(window.THREE.REVISION) === '128') {
+      import('./src/main.js').catch(error => {
+        console.error(error);
+        boot.hidden = false;
+        boot.textContent = 'BLACK VEIL startup error: ' + error.message;
+      });
+      return;
+    }
+    if (index >= sources.length) {
+      boot.hidden = false;
+      boot.textContent = 'BLACK VEIL could not load its required Three.js r128 runtime. If offline, install dependencies on a network-enabled machine, then run: node scripts/restore-three-runtime.cjs. Keep the official build at vendor/three.min.js and reload. No substitute runtime was loaded.';
+      console.error('Three.js r128 unavailable; tried:', sources);
+      return;
+    }
+    const url = sources[index++];
+    const script = document.createElement('script');
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      console.warn('Three.js source timed out:', url);
+      script.remove();
+      loadNext();
+    }, 7000);
+    script.src = url;
+    script.onload = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if (window.THREE && String(window.THREE.REVISION) === '128') loadNext();
+      else { console.warn('Unexpected Three.js build at', url); script.remove(); loadNext(); }
+    };
+    script.onerror = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      console.warn('Three.js source failed:', url);
+      script.remove();
+      loadNext();
+    };
+    document.head.appendChild(script);
+  };
+  loadNext();
+})();
+</script>
+</body>
+</html>

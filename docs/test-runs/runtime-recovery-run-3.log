@@ -1,0 +1,190 @@
+
+> black-veil@0.1.0 test
+> node tests/run.js && node tests/static.js && node tests/smoke.js && node tests/desktop.js
+
+  PASS Elias procedural character asset exists and GLB has a valid binary header
+Geometry / hit detection
+  PASS ray hits a wall in front
+  PASS ray misses when aimed away
+  PASS bullets do not pass through walls (LOS blocked)
+  PASS LOS passes over low cover at standing height
+  PASS crouching target behind low cover is not visible
+  PASS circle movement slides along a wall and respects bounds
+Damage
+  PASS headshot multiplier is 2.5x, limbs reduced
+  PASS armour reduces body damage more than headshots
+  PASS range falloff is monotonic and floored at 35%
+Perception
+  PASS enemy sees player in front with clear LOS
+  PASS enemy does not see player behind it
+  PASS enemy does not see through walls
+  PASS enemy does not see beyond range
+  PASS crouching lowers detection, sprinting raises it
+  PASS walls muffle noise
+Save system
+  PASS write then read round-trips
+  PASS invalid data is refused
+  PASS corrupt save falls back to the backup
+  PASS garbage storage never throws
+  PASS a failed write does not destroy the previous save
+Settings
+  PASS sanitize clamps, rejects bad types, keeps defaults
+  PASS null input yields defaults
+  PASS every schema key has a default
+Character identity / asset audit
+  PASS static GLB loader parses GLB v2 container without pretending to support skins
+  PASS character blockout variants have UV-bearing GLBs and honest status reports
+  PASS canonical character manifest distinguishes established canon from production targets
+  PASS faction design rules cover all requested primary groups without claiming nonexistent models
+  PASS chapter appearance targets cover all nine chapters and are deterministic data
+Weapons / data
+  PASS weapons are consistent
+  PASS all nine firearm definitions have stable slots and matching controls
+  PASS story: every trigger/interactable/cleared event exists
+  PASS story: actions use known verbs and valid references
+  PASS story: meaningful choices exist and both endings are written
+  PASS final authorization console exposes all three endgame decisions
+  PASS campaign now has nine unique levels with a matching story and chapter entry
+  PASS five ending branches are distinct and reachable from explicit story-state conditions
+  PASS NPC condition state machine blocks resurrection and invalid terminal transitions
+  PASS story: checkpoint indices exist in level data
+Level geometry / navigation (all doors opened)
+  PASS c1 FROSTLINE: start is walkable
+  PASS c1 every enemy spawn is walkable and reachable from start
+  PASS c1 interactables, triggers and pickups are reachable
+  PASS c1 checkpoints are walkable
+  PASS c1 chapter exit is reachable with doors open
+  PASS c2 THE WHITE VALLEY: start is walkable
+  PASS c2 every enemy spawn is walkable and reachable from start
+  PASS c2 interactables, triggers and pickups are reachable
+  PASS c2 checkpoints are walkable
+  PASS c2 chapter exit is reachable with doors open
+  PASS c3 KALDER RIDGE: start is walkable
+  PASS c3 every enemy spawn is walkable and reachable from start
+  PASS c3 interactables, triggers and pickups are reachable
+  PASS c3 checkpoints are walkable
+  PASS c3 chapter exit is reachable with doors open
+  PASS c3 closed doors really block (no sequence break)
+  PASS c4 UNDER THE RAILS: start is walkable
+  PASS c4 every enemy spawn is walkable and reachable from start
+  PASS c4 interactables, triggers and pickups are reachable
+  PASS c4 checkpoints are walkable
+  PASS c4 chapter exit is reachable with doors open
+  PASS c4 closed doors really block (no sequence break)
+  PASS c5 THE DESCENT: start is walkable
+  PASS c5 every enemy spawn is walkable and reachable from start
+  PASS c5 interactables, triggers and pickups are reachable
+  PASS c5 checkpoints are walkable
+  PASS c5 chapter exit is reachable with doors open
+  PASS c5 closed doors really block (no sequence break)
+  PASS c6 THE ARCHIVE: start is walkable
+  PASS c6 every enemy spawn is walkable and reachable from start
+  PASS c6 interactables, triggers and pickups are reachable
+  PASS c6 checkpoints are walkable
+  PASS c6 chapter exit is reachable with doors open
+  PASS c7 QUARANTINE: start is walkable
+  PASS c7 every enemy spawn is walkable and reachable from start
+  PASS c7 interactables, triggers and pickups are reachable
+  PASS c7 checkpoints are walkable
+  PASS c7 chapter exit is reachable with doors open
+  PASS c8 THE LONG NIGHT: start is walkable
+  PASS c8 every enemy spawn is walkable and reachable from start
+  PASS c8 interactables, triggers and pickups are reachable
+  PASS c8 checkpoints are walkable
+  PASS c8 chapter exit is reachable with doors open
+  PASS c9 BLACK VEIL: start is walkable
+  PASS c9 every enemy spawn is walkable and reachable from start
+  PASS c9 interactables, triggers and pickups are reachable
+  PASS c9 checkpoints are walkable
+  PASS c9 chapter exit is reachable with doors open
+  PASS c9 closed doors really block (no sequence break)
+  PASS enemies can path to the player start area from every group (combat reachability)
+  PASS A* path is collision-free (waypoint segments clear)
+Terrain, spatial index, slopes (chapter 2: The White Valley)
+  PASS terrain heights honour flat platforms and path heights
+  PASS terrain height is continuous (no steps between neighbouring samples)
+  PASS terrain normals: flat ground points up, ridge faces lean
+  PASS terrain rays: down hits ground, up misses, sideways hits the ridge
+  PASS terrain blocks line of sight across the ridge and bullets into the ground
+  PASS spatial index returns exactly what a linear scan returns (800 random queries)
+  PASS spatial index remove() takes a box out of every query
+  PASS valley: both routes north exist; the ridge path is walkable end to end below the slope limit
+  PASS valley: steep ground blocks walking (cliffs) and the station hill has cliff sides plus a ramp
+    (info) worst A* on the 160x160 valley grid: 15.8 ms on this machine
+  PASS valley: nav path requests are fast enough to budget (worst measured is printed)
+Save migration
+  PASS chapter order: ids are unique and legacy v1 chapters are still present
+  PASS v1 (index-based) saves migrate to the right chapter after the valley was inserted
+  PASS v2 saves are keyed by chapter id: inserting a chapter later keeps the right chapter
+  PASS a save for a chapter that no longer exists is refused, not loaded wrongly
+  PASS migrateSave never throws on garbage
+
+105 passed, 0 failed
+55 DOM references, 15 menu actions, 26 modules checked: no problems
+Boot / menu
+  PASS game boots to the main menu and renders menu frames
+Gameplay core (real code, stubbed renderer)
+  PASS new game: chapter card, then play state with player at the start
+  PASS first checkpoint is written at chapter start and is loadable
+  PASS movement stays inside the level and never enters solid geometry
+  PASS player cannot walk through the outpost wall
+  PASS firing consumes ammo, reload refills, empty-click auto reloads
+  PASS semi-auto pistol fires once per click; rifle fires automatically
+  PASS weapon switching works by key; locked weapons cannot be selected
+  PASS shotgun reloads shell by shell and can be interrupted by firing
+  PASS crouch and ADS change stance and zoom
+Enemy AI and combat fairness
+  PASS enemy facing a clear line of sight notices, fights and damages the player
+  PASS enemy never sees or damages the player through a solid wall
+  PASS enemy bullets hit cover instead of the player when LOS is blocked
+  PASS player shots are stopped by walls before reaching enemies (hit order)
+  PASS dead enemies stop acting; group-cleared event fires once
+  PASS enemy pathfinding: every spawn in every chapter reaches the player start (A*)
+Story, choices, endings and saves (scripted walkthrough, stubbed dialogue)
+  PASS playthrough A (spare warden + PRESERVE): reaches the PRESERVE ending
+  PASS playthrough B (leave warden + PURGE): reaches the PURGE ending
+  PASS choice consequences are implemented: spared opens the chapter-2 side door and the chapter-4 supply room
+  PASS dying and restarting restores the checkpoint state (weapons, choices, world state)
+  PASS continue loads the latest save; corrupt latest save falls back to its backup
+Chapter 2 vertical slice: terrain, compass, consequences
+  PASS valley: player follows the terrain height while walking and stays on walkable ground
+  PASS valley: pushing into the ridge stops at the cliff (no invisible wall, no climbing)
+  PASS valley: story sets the compass marker; compass renders without errors
+  PASS valley consequence: sparing the Warden reveals the supply cache, otherwise it stays hidden
+  PASS valley consequence: restoring the relay opens the chapter 3 side door even without the Warden
+  PASS valley: terrain stops player bullets (ground impact, no crash)
+  PASS valley: restoring checkpoint 2 re-applies the relay state and skips cleared camps
+  PASS pathfinding cost is spread across frames (at most 2 A* searches per frame)
+  PASS valley: 5 simulated minutes with combat keeps scene objects bounded
+Journal and chapter 4 (Under the Rails)
+  PASS journal: notes are recorded once, saved with checkpoints and restored after death
+  PASS journal: decisions are recorded with the chosen option
+  PASS journal: carries into the next chapter, and a malformed journal makes the save invalid
+  PASS chapter 4 decision: the rail pass opens the short spur, refusing keeps it shut; chapter 5 reacts to it
+  PASS chapter 4: depot checkpoint restore skips the entrance guard and keeps the pass state
+  PASS leg hit applies limping condition and death is terminal
+  PASS manual save slots 1-5 store independent chapter snapshots
+  PASS all nine weapon models can be unlocked and selected by the existing weapon controller
+  PASS post-game opens a separate Mara memory walk and persists optional discoveries
+Settings, long-session stability
+  PASS settings persist and are re-sanitised on load
+  PASS graphics preset really changes rendering parameters
+  PASS 10 minutes of simulated play with combat: object counts stay bounded
+
+42 passed, 0 failed
+Desktop file serving
+  PASS serves the game files
+  PASS refuses traversal and encoded traversal
+  PASS refuses non-game files
+  PASS mime types are correct for module scripts and assets
+  PASS every script/style referenced by index.html is servable and present (three.js only after prepare:vendor)
+  PASS every module imported by src/ is servable
+Packaging configuration
+  PASS package.json points at an existing main file and the electron toolchain
+  PASS electron-builder config is coherent
+  PASS icon is a 512px PNG
+  PASS workflow files exist and use the expected steps
+  PASS prepare-vendor script and gitignore exist
+  PASS main process source passes a syntax check and keeps secure window settings
+
+12 passed, 0 failed
