@@ -1,0 +1,43 @@
+name: Build BLACK VEIL for macOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Three.js r128
+        run: node scripts/restore-three-runtime.cjs
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build macOS app
+        run: npx electron-builder --mac --publish never
+
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: BLACK-VEIL-macOS
+          path: dist/**
+          if-no-files-found: error
+          retention-days: 14
