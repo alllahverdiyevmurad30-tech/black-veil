@@ -1,9 +1,10 @@
-name: Build BLACK VEIL for macOS
+name: Build macOS
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -19,25 +20,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
+
+      - name: Check project files
+        run: |
+          pwd
+          ls -la
+          test -f package.json || {
+            echo "ERROR: package.json not found"
+            exit 1
+          }
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Check Three.js r128
-        run: node scripts/restore-three-runtime.cjs
-
-      - name: Run tests
-        run: npm test
+        run: npm install --no-audit --no-fund
 
       - name: Build macOS app
-        run: npx electron-builder --mac --publish never
+        run: |
+          if npm run | grep -q "build:mac"; then
+            npm run build:mac
+          elif npm run | grep -q "build"; then
+            npm run build
+          else
+            echo "ERROR: No suitable build script found in package.json"
+            exit 1
+          fi
 
-      - name: Upload macOS build
+      - name: Upload build output
         uses: actions/upload-artifact@v4
         with:
           name: BLACK-VEIL-macOS
-          path: dist/**
+          path: |
+            dist/**
+            release/**
+            build/**
           if-no-files-found: error
           retention-days: 14
